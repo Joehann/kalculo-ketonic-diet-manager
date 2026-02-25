@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import { AuthRouter } from './ui/pages'
 import { TermsAcceptancePage } from './ui/pages/terms'
+import { NutritionDashboard } from './ui/pages/nutrition'
 import type { SessionToken } from './modules/authentication'
 
 // Import pour le OLD app (nutrition demo) - à décommenter pour tester
@@ -50,7 +51,7 @@ function App() {
       {appState === 'authenticated' && session && (
         <div className="authenticated-view">
           <header className="header">
-            <h1>Bienvenue Kalculo</h1>
+            <h1>Kalculo</h1>
             <div className="header__info">
               <p>Session Token: {session.token.substring(0, 20)}...</p>
               <p>Expire le: {new Date(session.expiresAt).toLocaleString('fr-FR')}</p>
@@ -61,11 +62,7 @@ function App() {
           </header>
 
           <section className="main-content">
-            <h2>Contenu Principal</h2>
-            <p>L'utilisateur est authentifié. Vous pouvez afficher le contenu de l'application ici.</p>
-            <p>
-              Cet espace servira à intégrer les autres pages (nutrition, etc.)
-            </p>
+            <NutritionDashboard />
           </section>
         </div>
       )}
