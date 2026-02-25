@@ -1,9 +1,70 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
-import { useUseCases } from './app/providers/useUseCases'
-import type { DailyNutritionSummary } from './modules/nutrition/domain/DailyNutritionSummary'
+import { AuthRouter } from './ui/pages'
+import type { SessionToken } from './modules/authentication'
+
+// Import pour le OLD app (nutrition demo) - à décommenter pour tester
+// import { useUseCases } from './app/providers/useUseCases'
+// import type { DailyNutritionSummary } from './modules/nutrition/domain/DailyNutritionSummary'
+
+type AppState = 'auth' | 'authenticated' | 'nutrition-demo'
 
 function App() {
+  const [appState, setAppState] = useState<AppState>('auth')
+  const [session, setSession] = useState<SessionToken | null>(null)
+
+  const handleAuthenticationSuccess = (sessionToken: SessionToken) => {
+    setSession(sessionToken)
+    setAppState('authenticated')
+  }
+
+  const handleLogout = () => {
+    setSession(null)
+    setAppState('auth')
+  }
+
+  return (
+    <main className="app-shell">
+      {appState === 'auth' && (
+        <AuthRouter onAuthenticationSuccess={handleAuthenticationSuccess} />
+      )}
+
+      {appState === 'authenticated' && session && (
+        <div className="authenticated-view">
+          <header className="header">
+            <h1>Bienvenue Kalculo</h1>
+            <div className="header__info">
+              <p>Session Token: {session.token.substring(0, 20)}...</p>
+              <p>Expire le: {new Date(session.expiresAt).toLocaleString('fr-FR')}</p>
+            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              Déconnexion
+            </button>
+          </header>
+
+          <section className="main-content">
+            <h2>Contenu Principal</h2>
+            <p>L'utilisateur est authentifié. Vous pouvez afficher le contenu de l'application ici.</p>
+            <p>
+              Cet espace servira à intégrer les autres pages (nutrition, etc.)
+            </p>
+          </section>
+        </div>
+      )}
+    </main>
+  )
+}
+
+export default App
+
+/**
+ * Alternative: Nutrition Demo
+ * 
+ * Pour tester la démo nutrition (ancienne version), décommenter le code ci-dessous
+ * et changer le state initial de appState
+ */
+/*
+function NutritionDemo() {
   const useCases = useUseCases()
   const [summary, setSummary] = useState<DailyNutritionSummary | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -16,7 +77,7 @@ function App() {
   }, [useCases])
 
   return (
-    <main className="app-shell">
+    <>
       <header>
         <p className="badge">Kalculo - Front baseline</p>
         <h1>Simulation in-memory active</h1>
@@ -55,8 +116,7 @@ function App() {
           </p>
         </section>
       )}
-    </main>
+    </>
   )
 }
-
-export default App
+*/
