@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalculo - UX Design Directions</title>
+  <style>
+    :root {
+      --purple-700: #6f2aa8;
+      --purple-600: #7e35b7;
+      --purple-500: #9147c9;
+      --gray-900: #1f1f24;
+      --gray-700: #4a4a57;
+      --gray-500: #7d7d8c;
+      --gray-300: #cfcfd8;
+      --gray-100: #f4f4f8;
+      --white: #ffffff;
+      --ok: #2e9d61;
+      --warn: #b67c11;
+      --err: #ba3b46;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--gray-900);
+      background: linear-gradient(180deg, #faf9fc 0%, #f3f2f8 100%);
+    }
+
+    header {
+      padding: 24px 20px 14px;
+      border-bottom: 1px solid #e8e6f0;
+      background: #fbfbff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-family: Poppins, Inter, sans-serif;
+      color: var(--purple-700);
+      font-size: 1.4rem;
+    }
+
+    p.meta {
+      margin: 0;
+      color: var(--gray-700);
+      font-size: 0.92rem;
+    }
+
+    .wrap {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+    }
+
+    .dir {
+      --accent: #7e35b7;
+      --accent-soft: #f3ebfb;
+      background: var(--white);
+      border: 1px solid #e4e1ee;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(42, 20, 66, 0.08);
+      overflow: hidden;
+    }
+
+    .dir .top {
+      padding: 12px 14px;
+      border-bottom: 1px solid #edeaf5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: #fbfaff;
+    }
+
+    .dir h2 {
+      margin: 0;
+      font-family: Poppins, Inter, sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid color-mix(in oklab, var(--accent) 35%, white);
+      color: var(--accent);
+      background: var(--accent-soft);
+      white-space: nowrap;
+    }
+
+    .phone {
+      margin: 14px auto 16px;
+      width: 250px;
+      border: 1px solid #d4d0df;
+      border-radius: 24px;
+      background: var(--white);
+      overflow: hidden;
+    }
+
+    .status {
+      padding: 9px 12px;
+      font-size: 0.75rem;
+      color: var(--gray-700);
+      background: #f8f7fc;
+      border-bottom: 1px solid #ece9f6;
+    }
+
+    .screen { padding: 12px; }
+    .title {
+      font-family: Poppins, Inter, sans-serif;
+      margin: 2px 0 10px;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+    .text {
+      margin: 0 0 8px;
+      color: var(--gray-700);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.74rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--accent) 35%, white);
+      color: var(--accent);
+      margin-right: 5px;
+      margin-bottom: 7px;
+      background: var(--accent-soft);
+    }
+
+    .input {
+      border: 2px solid #9f9faa;
+      border-radius: 14px;
+      height: 44px;
+      margin: 9px 0;
+      position: relative;
+      background: #fff;
+    }
+    .input .label {
+      position: absolute;
+      top: -10px;
+      left: 12px;
+      background: #fff;
+      padding: 0 6px;
+      font-size: 0.72rem;
+      color: #6f6f7b;
+    }
+
+    .row { display: grid; gap: 9px; grid-template-columns: 1fr 1fr; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      border: none;
+      border-radius: 13px;
+      padding: 11px 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      cursor: default;
+    }
+
+    .btn-primary { background: var(--purple-700); color: white; }
+    .btn-soft { background: var(--accent-soft); color: var(--accent); }
+    .btn-outline {
+      background: white;
+      color: var(--accent);
+      border: 2px solid color-mix(in oklab, var(--accent) 70%, white);
+    }
+
+    .card {
+      border: 1px solid #ddd9ea;
+      border-radius: var(--radius);
+      padding: 10px;
+      margin: 8px 0;
+      background: #fff;
+    }
+    .card strong { font-size: 0.8rem; }
+    .muted { color: var(--gray-500); font-size: 0.74rem; }
+
+    .state {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-top: 8px;
+      border-top: 1px dashed #ddd9ea;
+      padding-top: 8px;
+    }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .err { color: var(--err); }
+
+    .note {
+      padding: 0 14px 14px;
+      font-size: 0.8rem;
+      color: var(--gray-700);
+    }
+
+    .d1 { --accent: #0f8b8d; --accent-soft: #eaf9f8; } /* teal serenite */
+    .d2 { --accent: #3f51b5; --accent-soft: #eef1ff; } /* indigo structure */
+    .d3 { --accent: #2a9d8f; --accent-soft: #e8f7f4; } /* green trust */
+    .d4 { --accent: #b67c11; --accent-soft: #fff7e6; } /* amber focus */
+    .d5 { --accent: #b0487a; --accent-soft: #fbeef4; } /* rose warmth */
+    .d6 { --accent: #2b6cb0; --accent-soft: #eaf2fc; } /* blue confidence */
+
+    footer {
+      padding: 8px 20px 24px;
+      color: var(--gray-700);
+      font-size: 0.86rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kalculo - Directions visuelles</h1>
+    <p class="meta">6 variantes comparees pour selection ou combinaison (mobile-first, violet + neutres, ton serein)</p>
+  </header>
+
+  <main class="wrap">
+    <section class="dir d1">
+      <div class="top"><h2>Direction 1 - Zen Airy</h2><span class="tag">respiration max</span></div>
+      <div class="phone">
+        <div class="status">09:41</div>
+        <div class="screen">
+          <div class="title">Profil enfant</div>
+          <p class="text">Interface tres aeree, rythme vertical lent, guidance douce.</p>
+          <div class="input"><span class="label">Nom du profil</span></div>
+          <div class="input"><span class="label">Objectif glucides/jour</span></div>
+          <button class="btn btn-outline">Verifier les infos</button>
+          <button class="btn btn-primary">Continuer</button>
+        </div>
+      </div>
+      <p class="note">Ideal pour reduire l'anxiete et favoriser la comprehension progressive.</p>
+    </section>
+
+    <section class="dir d2">
+      <div class="top"><h2>Direction 2 - Operational Dense</h2><span class="tag">efficacite parent</span></div>
+      <div class="phone">
+        <div class="status">09:41</div>
+        <div class="screen">
+          <div class="title">Journee de Marc</div>
+          <span class="pill">Glucides 12/20g</span>
+          <span class="pill">Calories 780/1200</span>
+          <div class="card"><strong>Petit-dejeuner</strong><div class="muted">3 items</div></div>
+          <div class="card"><strong>Dejeuner</strong><div class="muted">2 items</div></div>
+          <div class="state"><span class="warn">A verifier</span><span>2 alertes</span></div>
+          <button class="btn btn-primary">Valider et verrouiller</button>
+        </div>
+      </div>
+      <p class="note">Plus compact, performant pour les parents habitues et les usages urgents.</p>
+    </section>
+
+    <section class="dir d3">
+      <div class="top"><h2>Direction 3 - Card Story</h2><span class="tag">guidage par etapes</span></div>
+      <div class="phone">
+        <div class="status">09:41</div>
+        <div class="screen">
+          <div class="title">Preparation du jour</div>
+          <div class="card"><strong>1. Construire les repas</strong><div class="muted">Ajoute les aliments</div></div>
+          <div class="card"><strong>2. Verifier conformite</strong><div class="muted">Controles automatiques</div></div>
+          <div class="card"><strong>3. Partager aux proches</strong><div class="muted">Acces lecture seule</div></div>
+          <button class="btn btn-soft">Voir details macros</button>
+          <button class="btn btn-primary">Demarrer l'etape 1</button>
+        </div>
+      </div>
+      <p class="note">Excellent pour aidants ou nouveaux utilisateurs grace a la progression explicite.</p>
+    </section>
+
+    <section class="dir d4">
+      <div class="top"><h2>Direction 4 - Status First</h2><span class="tag">securite visible</span></div>
+      <div class="phone">
+        <div class="status">09:41</div>
+        <div class="screen">
+          <div class="title">Etat du menu</div>
+          <div class="card">
+            <strong>Menu du samedi</strong>
+            <div class="state"><span class="ok">Conforme</span><span>Pret a verrouiller</span></div>
+          </div>
+          <div class="card">
+            <strong>Partage aidant</strong>
+            <div class="state"><span class="warn">Inactif</span><span>A configurer</span></div>
+          </div>
+          <div class="card">
+            <strong>Suivi checklist</strong>
+            <div class="state"><span class="ok">2/4 repas confirms</span><span>En cours</span></div>
+          </div>
+          <button class="btn btn-primary">Activer partage</button>
+        </div>
+      </div>
+      <p class="note">Priorise les statuts critiques (conforme, verrouille, partage, expire).</p>
+    </section>
+
+    <section class="dir d5">
+      <div class="top"><h2>Direction 5 - Form Comfort</h2><span class="tag">style mockups</span></div>
+      <div class="phone">
+        <div class="status">09:41</div>
+        <div class="screen">
+          <div class="title">Paiement support</div>
+          <div class="input"><span class="label">Nom du porteur de carte</span></div>
+          <div class="input"><span class="label">Numero de carte</span></div>
+          <div class="row">
+            <div class="input"><span class="label">Validite</span></div>
+            <div class="input"><span class="label">Code securite</span></div>
+          </div>
+          <button class="btn btn-primary">Je m'abonne pour 3,99EUR/mois</button>
+        </div>
+      </div>
+      <p class="note">Reprise directe des codes actuels: bords arrondis, labels flottants, full-width.</p>
+    </section>
+
+    <section class="dir d6">
+      <div class="top"><h2>Direction 6 - Family Trust</h2><span class="tag">handoff parent-aidant</span></div>
+      <div class="phone">
+        <div class="status">09:41</div>
+        <div class="screen">
+          <div class="title">Partage vacances</div>
+          <p class="text">Menu verrouille pour Mamie - du 12 au 18 aout.</p>
+          <div class="card"><strong>Code partage</strong><div class="muted">KLC-49MF</div></div>
+          <div class="card"><strong>Acces</strong><div class="muted">Lecture seule active</div></div>
+          <div class="card"><strong>Rappel serenite</strong><div class="muted">Les macros sont deja validees.</div></div>
+          <button class="btn btn-soft">Voir checklist aidant</button>
+          <button class="btn btn-primary">Confirmer le partage</button>
+        </div>
+      </div>
+      <p class="note">Met l'accent sur la confiance relationnelle et la delegation securisee.</p>
+    </section>
+  </main>
+
+  <footer>
+    Recommandation de travail: choisir une direction principale + 2 ou 3 elements secondaires a combiner.
+  </footer>
+</body>
+</html>

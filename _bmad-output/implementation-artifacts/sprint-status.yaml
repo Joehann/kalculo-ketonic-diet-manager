@@ -1,0 +1,87 @@
+# generated: 2026-02-24
+# project: kalculo
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: /Users/johann/PersonalDev/kalculo/_bmad-output/implementation-artifacts
+#
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review
+
+generated: "2026-02-24"
+project: "kalculo"
+project_key: "NOKEY"
+tracking_system: "file-system"
+story_location: "/Users/johann/PersonalDev/kalculo/_bmad-output/implementation-artifacts"
+
+development_status:
+  epic-1: in-progress
+  1-1-set-up-initial-project-from-starter-template: review
+  1-2-creer-un-compte-parent-avec-authentification-securisee: review
+  1-3-accepter-les-termes-et-limites-de-responsabilite: backlog
+  1-4-gerer-le-profil-enfant-et-le-protocole-dietetique: backlog
+  1-5-configurer-les-cibles-macros-avec-historique-versionne: backlog
+  1-6-initialiser-le-backend-axum-en-base-technique-isolee: backlog
+  1-7-integrer-les-contrats-frontend-avec-l-api-reelle: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-ajouter-et-selectionner-des-aliments-pour-un-menu: backlog
+  2-2-valider-la-coherence-nutritionnelle-des-donnees-aliments: backlog
+  2-3-creer-et-modifier-un-menu-quotidien-en-mode-brouillon: backlog
+  2-4-calculer-les-totaux-macros-et-afficher-la-conformite: backlog
+  2-5-bloquer-le-partage-des-menus-non-conformes: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-verrouiller-un-menu-conforme: backlog
+  3-2-enforcer-l-immutabilite-pour-les-acteurs-non-parent: backlog
+  3-3-conserver-et-consulter-l-historique-des-menus-verrouilles: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-creer-une-fenetre-de-partage-pour-menus-verrouilles: backlog
+  4-2-donner-un-acces-aidant-uniquement-par-delegation: backlog
+  4-3-afficher-les-menus-partages-en-lecture-seule-cote-aidant: backlog
+  4-4-revoquer-immediatement-un-partage-actif: backlog
+  4-5-expirer-automatiquement-les-partages-arrives-a-echeance: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-confirmer-l-execution-des-repas-via-checklist-aidant: backlog
+  5-2-visualiser-cote-parent-les-confirmations-aidant: backlog
+  5-3-journaliser-les-evenements-critiques-de-delegation: backlog
+  5-4-consulter-l-historique-d-evenements-sur-une-periode-de-garde: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-livrer-une-interface-responsive-parent-et-aidant-mobile-tablette: backlog
+  6-2-atteindre-les-cibles-de-performance-sur-actions-critiques: backlog
+  6-3-gerer-la-fraicheur-de-donnees-via-rafraichissement-utilisateur: backlog
+  6-4-satisfaire-le-baseline-accessibilite-wcag-2-1-aa-sur-flows-critiques: backlog
+  epic-6-retrospective: optional

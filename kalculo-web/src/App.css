@@ -1,0 +1,39 @@
+#root {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.app-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.badge {
+  margin: 0;
+  color: #475569;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.summary-card ul {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.hint-text {
+  margin-top: 1rem;
+  color: #334155;
+}
+
+.error-text {
+  color: #b91c1c;
+}
