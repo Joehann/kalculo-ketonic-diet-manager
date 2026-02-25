@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import './App.css'
 import { AuthRouter } from './ui/pages'
+import { TermsAcceptancePage } from './ui/pages/terms'
 import type { SessionToken } from './modules/authentication'
 
 // Import pour le OLD app (nutrition demo) - à décommenter pour tester
 // import { useUseCases } from './app/providers/useUseCases'
 // import type { DailyNutritionSummary } from './modules/nutrition/domain/DailyNutritionSummary'
 
-type AppState = 'auth' | 'authenticated' | 'nutrition-demo'
+type AppState = 'auth' | 'terms' | 'authenticated' | 'nutrition-demo'
 
 function App() {
   const [appState, setAppState] = useState<AppState>('auth')
@@ -15,6 +16,15 @@ function App() {
 
   const handleAuthenticationSuccess = (sessionToken: SessionToken) => {
     setSession(sessionToken)
+    setAppState('terms')
+  }
+
+  const handleTermsAcceptance = () => {
+    setAppState('authenticated')
+  }
+
+  const handleSkipTerms = () => {
+    // Allow skipping for now, but this should require acceptance eventually
     setAppState('authenticated')
   }
 
@@ -27,6 +37,14 @@ function App() {
     <main className="app-shell">
       {appState === 'auth' && (
         <AuthRouter onAuthenticationSuccess={handleAuthenticationSuccess} />
+      )}
+
+      {appState === 'terms' && session && (
+        <TermsAcceptancePage
+          parentId={session.parentId}
+          onAcceptanceSuccess={handleTermsAcceptance}
+          onSkip={handleSkipTerms}
+        />
       )}
 
       {appState === 'authenticated' && session && (
