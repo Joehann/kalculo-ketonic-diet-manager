@@ -6,6 +6,11 @@ import {
   InMemoryPasswordHasherAdapter,
   InMemorySessionStorageAdapter,
 } from '../../modules/authentication'
+import {
+  buildTermsUseCases,
+  InMemoryTermsAcceptanceRepositoryAdapter,
+  InMemoryTermsStorageAdapter,
+} from '../../modules/terms'
 
 export const buildDiContainer = () => {
   const dataSource = getDataSourceFromEnv()
@@ -14,6 +19,11 @@ export const buildDiContainer = () => {
   const parentRepositoryAdapter = new InMemoryParentRepositoryAdapter()
   const passwordHasherAdapter = new InMemoryPasswordHasherAdapter()
   const sessionStorageAdapter = new InMemorySessionStorageAdapter()
+
+  // Initialize terms adapters
+  const termsAcceptanceRepositoryAdapter =
+    new InMemoryTermsAcceptanceRepositoryAdapter()
+  const termsStorageAdapter = new InMemoryTermsStorageAdapter()
 
   return {
     dataSource,
@@ -24,6 +34,7 @@ export const buildDiContainer = () => {
         passwordHasherAdapter,
         sessionStorageAdapter,
       ),
+      terms: buildTermsUseCases(termsAcceptanceRepositoryAdapter, termsStorageAdapter),
     },
   }
 }
