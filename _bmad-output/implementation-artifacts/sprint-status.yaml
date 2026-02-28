@@ -55,7 +55,7 @@ development_status:
   2-2-valider-la-coherence-nutritionnelle-des-donnees-aliments: review
   2-3-creer-et-modifier-un-menu-quotidien-en-mode-brouillon: review
   2-4-calculer-les-totaux-macros-et-afficher-la-conformite: review
-  2-5-bloquer-le-partage-des-menus-non-conformes: backlog
+  2-5-bloquer-le-partage-des-menus-non-conformes: review
   epic-2-retrospective: optional
 
   epic-3: backlog

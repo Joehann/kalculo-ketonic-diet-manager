@@ -11,6 +11,7 @@ import {
   IncoherentFoodNutritionDataError,
   IncompleteFoodNutritionDataError,
   InvalidQuantityError,
+  MenuNotCompliantForSharingError,
 } from '../../../../modules/menu-draft'
 import { useUseCases } from '../../../../app/providers/useUseCases'
 import { Alert, Button, Card, CardBody, CardHeader, Input } from '../../../design-system'
@@ -34,6 +35,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [complianceResult, setComplianceResult] = useState<DraftComplianceResult | null>(null)
+  const [shareMessage, setShareMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -83,6 +85,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   const handleAddFood = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
+    setShareMessage(null)
 
     try {
       setIsSubmitting(true)
@@ -117,6 +120,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
 
   const handleUpdateLineQuantity = async (lineId: string) => {
     setError(null)
+    setShareMessage(null)
 
     try {
       setIsSubmitting(true)
@@ -147,6 +151,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
 
   const handleRemoveLine = async (lineId: string) => {
     setError(null)
+    setShareMessage(null)
 
     try {
       setIsSubmitting(true)
@@ -173,6 +178,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
 
   const handleMoveLine = async (lineId: string, direction: 'up' | 'down') => {
     setError(null)
+    setShareMessage(null)
 
     try {
       setIsSubmitting(true)
@@ -200,6 +206,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
 
   const handleCalculateCompliance = async () => {
     setError(null)
+    setShareMessage(null)
 
     try {
       setIsSubmitting(true)
@@ -213,6 +220,34 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       setComplianceResult(result)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleOpenShareFlow = async () => {
+    setError(null)
+    setShareMessage(null)
+
+    try {
+      setIsSubmitting(true)
+
+      const result = await useCases.menuDraft.authorizeDraftShareQuery({
+        parentId,
+        childId: childProfile.id,
+        day: currentDay,
+      })
+
+      setComplianceResult(result)
+      setShareMessage(
+        'Partage autorise: le menu est conforme et peut entrer dans le flow de partage.',
+      )
+    } catch (caught) {
+      if (caught instanceof MenuNotCompliantForSharingError) {
+        setError(caught.message)
+      } else {
+        setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -242,6 +277,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
 
         <CardBody>
           {error && <Alert type="error">{error}</Alert>}
+          {shareMessage && <Alert type="success">{shareMessage}</Alert>}
 
           <form className="menu-draft-page__form" onSubmit={handleAddFood}>
             <div className="menu-draft-page__field">
@@ -399,6 +435,18 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                 </p>
               </article>
             )}
+
+            <div className="menu-draft-page__share-action">
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                disabled={isSubmitting}
+                onClick={handleOpenShareFlow}
+              >
+                Ouvrir partage
+              </Button>
+            </div>
           </section>
         </CardBody>
       </Card>

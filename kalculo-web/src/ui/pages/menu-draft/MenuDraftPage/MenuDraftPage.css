@@ -134,3 +134,7 @@
 .menu-draft-page__status--ko {
   color: #b91c1c;
 }
+
+.menu-draft-page__share-action {
+  margin-top: 0.75rem;
+}

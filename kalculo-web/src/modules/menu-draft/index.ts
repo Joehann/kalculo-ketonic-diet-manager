@@ -37,6 +37,10 @@ export {
   type CalculateDraftComplianceQuery,
 } from './application/queries/calculateDraftComplianceQuery'
 export {
+  buildAuthorizeDraftShareQuery,
+  type AuthorizeDraftShareQuery,
+} from './application/queries/authorizeDraftShareQuery'
+export {
   buildListFoodCatalogQuery,
   type ListFoodCatalogQuery,
 } from './application/queries/listFoodCatalogQuery'
@@ -53,6 +57,7 @@ import { buildMoveDraftLineCommand } from './application/commands/moveDraftLineC
 import { buildRemoveDraftLineCommand } from './application/commands/removeDraftLineCommand'
 import { buildUpdateDraftLineQuantityCommand } from './application/commands/updateDraftLineQuantityCommand'
 import { buildCalculateDraftComplianceQuery } from './application/queries/calculateDraftComplianceQuery'
+import { buildAuthorizeDraftShareQuery } from './application/queries/authorizeDraftShareQuery'
 import { buildGetDailyDraftMenuQuery } from './application/queries/getDailyDraftMenuQuery'
 import { buildListFoodCatalogQuery } from './application/queries/listFoodCatalogQuery'
 import type { FoodCatalogQueryPort } from './application/ports/FoodCatalogQueryPort'
@@ -79,13 +84,17 @@ export const buildMenuDraftUseCases = (
       ? new ApiMenuDraftRepositoryAdapter()
       : new InMemoryMenuDraftRepositoryAdapter()
 
+  const calculateDraftComplianceQuery = buildCalculateDraftComplianceQuery(
+    draftRepositoryPort,
+    macroTargetsQueryPort,
+  )
+
   return {
     listFoodCatalogQuery: buildListFoodCatalogQuery(foodCatalogQueryPort),
     getDailyDraftMenuQuery: buildGetDailyDraftMenuQuery(draftRepositoryPort),
-    calculateDraftComplianceQuery: buildCalculateDraftComplianceQuery(
-      draftRepositoryPort,
-      macroTargetsQueryPort,
-    ),
+    calculateDraftComplianceQuery,
+    authorizeDraftShareQuery:
+      buildAuthorizeDraftShareQuery(calculateDraftComplianceQuery),
     addFoodToDraftMenuCommand: buildAddFoodToDraftMenuCommand(
       draftRepositoryPort,
       foodCatalogQueryPort,
