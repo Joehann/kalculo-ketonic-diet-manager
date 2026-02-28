@@ -1,0 +1,91 @@
+.menu-draft-page {
+  width: 100%;
+  max-width: 880px;
+}
+
+.menu-draft-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.menu-draft-page__title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.menu-draft-page__subtitle {
+  margin: 0;
+  color: #6b7280;
+}
+
+.menu-draft-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menu-draft-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-draft-page__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.menu-draft-page__select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #111827;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+}
+
+.menu-draft-page__lines {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.menu-draft-page__lines-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+}
+
+.menu-draft-page__empty {
+  margin: 0;
+  color: #6b7280;
+}
+
+.menu-draft-page__line-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+}
+
+.menu-draft-page__line-item + .menu-draft-page__line-item {
+  margin-top: 0.5rem;
+}
+
+.menu-draft-page__line-title,
+.menu-draft-page__line-macros {
+  margin: 0;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.menu-draft-page__line-macros {
+  margin-top: 0.25rem;
+}
+
+.menu-draft-page__line-macros--snapshot {
+  color: #6b7280;
+}

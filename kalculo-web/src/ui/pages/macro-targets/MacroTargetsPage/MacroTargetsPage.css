@@ -1,0 +1,67 @@
+.macro-targets-page {
+  width: 100%;
+  max-width: 720px;
+}
+
+.macro-targets-page__card {
+  width: 100%;
+}
+
+.macro-targets-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.macro-targets-page__title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.macro-targets-page__subtitle {
+  margin: 0;
+  color: #6b7280;
+}
+
+.macro-targets-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.macro-targets-page__history {
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.macro-targets-page__history-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.macro-targets-page__history-empty {
+  margin: 0;
+  color: #6b7280;
+}
+
+.macro-targets-page__history-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  background: #f9fafb;
+}
+
+.macro-targets-page__history-meta,
+.macro-targets-page__history-values {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.macro-targets-page__history-values + .macro-targets-page__history-values {
+  margin-top: 0.25rem;
+}

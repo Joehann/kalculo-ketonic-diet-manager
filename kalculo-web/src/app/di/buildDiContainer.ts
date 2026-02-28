@@ -12,6 +12,8 @@ import {
   InMemoryTermsStorageAdapter,
 } from '../../modules/terms'
 import { buildChildProfileUseCases } from '../../modules/child-profile'
+import { buildMacroTargetsUseCases } from '../../modules/macro-targets'
+import { buildMenuDraftUseCases } from '../../modules/menu-draft'
 
 export const buildDiContainer = () => {
   const dataSource = getDataSourceFromEnv()
@@ -37,6 +39,8 @@ export const buildDiContainer = () => {
       ),
       terms: buildTermsUseCases(termsAcceptanceRepositoryAdapter, termsStorageAdapter),
       childProfile: buildChildProfileUseCases(dataSource),
+      macroTargets: buildMacroTargetsUseCases(dataSource),
+      menuDraft: buildMenuDraftUseCases(dataSource),
     },
   }
 }
