@@ -28,6 +28,8 @@ export const buildDiContainer = () => {
     new InMemoryTermsAcceptanceRepositoryAdapter()
   const termsStorageAdapter = new InMemoryTermsStorageAdapter()
 
+  const macroTargetsUseCases = buildMacroTargetsUseCases(dataSource)
+
   return {
     dataSource,
     useCases: {
@@ -39,8 +41,10 @@ export const buildDiContainer = () => {
       ),
       terms: buildTermsUseCases(termsAcceptanceRepositoryAdapter, termsStorageAdapter),
       childProfile: buildChildProfileUseCases(dataSource),
-      macroTargets: buildMacroTargetsUseCases(dataSource),
-      menuDraft: buildMenuDraftUseCases(dataSource),
+      macroTargets: macroTargetsUseCases,
+      menuDraft: buildMenuDraftUseCases(dataSource, {
+        getActiveByChildId: macroTargetsUseCases.getActiveMacroTargetsQuery,
+      }),
     },
   }
 }

@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ChildProfile } from '../../../../modules/child-profile'
-import type { DailyMenuDraft, FoodItem } from '../../../../modules/menu-draft'
+import type {
+  DailyMenuDraft,
+  DraftComplianceResult,
+  FoodItem,
+} from '../../../../modules/menu-draft'
 import {
   DraftLineNotFoundError,
   FoodItemNotFoundError,
@@ -29,6 +33,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [complianceResult, setComplianceResult] = useState<DraftComplianceResult | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -91,6 +96,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       })
 
       setDraft(updatedDraft)
+      setComplianceResult(null)
       setQuantityGrams('100')
     } catch (caught) {
       if (
@@ -124,6 +130,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       })
 
       setDraft(updatedDraft)
+      setComplianceResult(null)
     } catch (caught) {
       if (
         caught instanceof InvalidQuantityError ||
@@ -152,6 +159,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       })
 
       setDraft(updatedDraft)
+      setComplianceResult(null)
     } catch (caught) {
       if (caught instanceof DraftLineNotFoundError) {
         setError(caught.message)
@@ -178,12 +186,33 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       })
 
       setDraft(updatedDraft)
+      setComplianceResult(null)
     } catch (caught) {
       if (caught instanceof DraftLineNotFoundError) {
         setError(caught.message)
       } else {
         setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
       }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCalculateCompliance = async () => {
+    setError(null)
+
+    try {
+      setIsSubmitting(true)
+
+      const result = await useCases.menuDraft.calculateDraftComplianceQuery({
+        parentId,
+        childId: childProfile.id,
+        day: currentDay,
+      })
+
+      setComplianceResult(result)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
     } finally {
       setIsSubmitting(false)
     }
@@ -327,8 +356,60 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
               </article>
             ))}
           </section>
+
+          <section className="menu-draft-page__compliance">
+            <div className="menu-draft-page__compliance-header">
+              <h2 className="menu-draft-page__lines-title">Calcul de conformite</h2>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={isSubmitting}
+                onClick={handleCalculateCompliance}
+              >
+                Calculer conformite
+              </Button>
+            </div>
+
+            {!complianceResult && (
+              <p className="menu-draft-page__empty">
+                Lancez le calcul pour voir les totaux et le statut.
+              </p>
+            )}
+
+            {complianceResult && (
+              <article className="menu-draft-page__compliance-card">
+                <p
+                  className={
+                    complianceResult.status === 'compliant'
+                      ? 'menu-draft-page__status menu-draft-page__status--ok'
+                      : 'menu-draft-page__status menu-draft-page__status--ko'
+                  }
+                >
+                  Statut: {complianceResult.status === 'compliant' ? 'Conforme' : 'Non conforme'}
+                </p>
+                <p className="menu-draft-page__line-macros">
+                  Totaux: {complianceResult.totals.caloriesKcal} kcal, P {complianceResult.totals.proteinGrams}g, C {complianceResult.totals.carbsGrams}g, L {complianceResult.totals.fatsGrams}g
+                </p>
+                <p className="menu-draft-page__line-macros">
+                  Cibles: P {complianceResult.targets.proteinTargetGrams}g, C {complianceResult.targets.carbsTargetGrams}g, L {complianceResult.targets.fatsTargetGrams}g
+                </p>
+                <p className="menu-draft-page__line-macros">
+                  Ecarts: P {formatDelta(complianceResult.deltas.proteinGrams)}g, C {formatDelta(complianceResult.deltas.carbsGrams)}g, L {formatDelta(complianceResult.deltas.fatsGrams)}g
+                </p>
+              </article>
+            )}
+          </section>
         </CardBody>
       </Card>
     </div>
   )
+}
+
+const formatDelta = (value: number): string => {
+  if (value > 0) {
+    return `+${value}`
+  }
+
+  return `${value}`
 }

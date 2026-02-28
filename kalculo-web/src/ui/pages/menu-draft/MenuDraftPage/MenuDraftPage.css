@@ -100,3 +100,37 @@
 .menu-draft-page__line-macros--snapshot {
   color: #6b7280;
 }
+
+.menu-draft-page__compliance {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.menu-draft-page__compliance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.menu-draft-page__compliance-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+}
+
+.menu-draft-page__status {
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+
+.menu-draft-page__status--ok {
+  color: #065f46;
+}
+
+.menu-draft-page__status--ko {
+  color: #b91c1c;
+}

@@ -1,10 +1,12 @@
 // Domain
 export * from './domain/FoodItem'
 export * from './domain/MenuDraft'
+export * from './domain/DraftCompliance'
 export * from './domain/errors/MenuDraftError'
 
 // Application
 export { type FoodCatalogQueryPort } from './application/ports/FoodCatalogQueryPort'
+export { type MacroTargetsQueryPort } from './application/ports/MacroTargetsQueryPort'
 export { type MenuDraftRepositoryPort } from './application/ports/MenuDraftRepositoryPort'
 export {
   buildAddFoodToDraftMenuCommand,
@@ -31,6 +33,10 @@ export {
   type GetDailyDraftMenuQuery,
 } from './application/queries/getDailyDraftMenuQuery'
 export {
+  buildCalculateDraftComplianceQuery,
+  type CalculateDraftComplianceQuery,
+} from './application/queries/calculateDraftComplianceQuery'
+export {
   buildListFoodCatalogQuery,
   type ListFoodCatalogQuery,
 } from './application/queries/listFoodCatalogQuery'
@@ -46,9 +52,11 @@ import { buildAddFoodToDraftMenuCommand } from './application/commands/addFoodTo
 import { buildMoveDraftLineCommand } from './application/commands/moveDraftLineCommand'
 import { buildRemoveDraftLineCommand } from './application/commands/removeDraftLineCommand'
 import { buildUpdateDraftLineQuantityCommand } from './application/commands/updateDraftLineQuantityCommand'
+import { buildCalculateDraftComplianceQuery } from './application/queries/calculateDraftComplianceQuery'
 import { buildGetDailyDraftMenuQuery } from './application/queries/getDailyDraftMenuQuery'
 import { buildListFoodCatalogQuery } from './application/queries/listFoodCatalogQuery'
 import type { FoodCatalogQueryPort } from './application/ports/FoodCatalogQueryPort'
+import type { MacroTargetsQueryPort } from './application/ports/MacroTargetsQueryPort'
 import type { MenuDraftRepositoryPort } from './application/ports/MenuDraftRepositoryPort'
 import { ApiFoodCatalogQueryAdapter } from './infrastructure/api/ApiFoodCatalogQueryAdapter'
 import { ApiMenuDraftRepositoryAdapter } from './infrastructure/api/ApiMenuDraftRepositoryAdapter'
@@ -57,7 +65,10 @@ import { InMemoryMenuDraftRepositoryAdapter } from './infrastructure/in-memory/I
 
 export type MenuDraftDataSource = 'inmemory' | 'api'
 
-export const buildMenuDraftUseCases = (dataSource: MenuDraftDataSource) => {
+export const buildMenuDraftUseCases = (
+  dataSource: MenuDraftDataSource,
+  macroTargetsQueryPort: MacroTargetsQueryPort,
+) => {
   const foodCatalogQueryPort: FoodCatalogQueryPort =
     dataSource === 'api'
       ? new ApiFoodCatalogQueryAdapter()
@@ -71,6 +82,10 @@ export const buildMenuDraftUseCases = (dataSource: MenuDraftDataSource) => {
   return {
     listFoodCatalogQuery: buildListFoodCatalogQuery(foodCatalogQueryPort),
     getDailyDraftMenuQuery: buildGetDailyDraftMenuQuery(draftRepositoryPort),
+    calculateDraftComplianceQuery: buildCalculateDraftComplianceQuery(
+      draftRepositoryPort,
+      macroTargetsQueryPort,
+    ),
     addFoodToDraftMenuCommand: buildAddFoodToDraftMenuCommand(
       draftRepositoryPort,
       foodCatalogQueryPort,
