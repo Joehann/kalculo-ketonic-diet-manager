@@ -12,6 +12,21 @@ export {
   type AddFoodToDraftMenuCommandInput,
 } from './application/commands/addFoodToDraftMenuCommand'
 export {
+  buildUpdateDraftLineQuantityCommand,
+  type UpdateDraftLineQuantityCommand,
+  type UpdateDraftLineQuantityCommandInput,
+} from './application/commands/updateDraftLineQuantityCommand'
+export {
+  buildRemoveDraftLineCommand,
+  type RemoveDraftLineCommand,
+  type RemoveDraftLineCommandInput,
+} from './application/commands/removeDraftLineCommand'
+export {
+  buildMoveDraftLineCommand,
+  type MoveDraftLineCommand,
+  type MoveDraftLineCommandInput,
+} from './application/commands/moveDraftLineCommand'
+export {
   buildGetDailyDraftMenuQuery,
   type GetDailyDraftMenuQuery,
 } from './application/queries/getDailyDraftMenuQuery'
@@ -28,6 +43,9 @@ export { ApiMenuDraftRepositoryAdapter } from './infrastructure/api/ApiMenuDraft
 
 // Factory for use cases
 import { buildAddFoodToDraftMenuCommand } from './application/commands/addFoodToDraftMenuCommand'
+import { buildMoveDraftLineCommand } from './application/commands/moveDraftLineCommand'
+import { buildRemoveDraftLineCommand } from './application/commands/removeDraftLineCommand'
+import { buildUpdateDraftLineQuantityCommand } from './application/commands/updateDraftLineQuantityCommand'
 import { buildGetDailyDraftMenuQuery } from './application/queries/getDailyDraftMenuQuery'
 import { buildListFoodCatalogQuery } from './application/queries/listFoodCatalogQuery'
 import type { FoodCatalogQueryPort } from './application/ports/FoodCatalogQueryPort'
@@ -57,6 +75,10 @@ export const buildMenuDraftUseCases = (dataSource: MenuDraftDataSource) => {
       draftRepositoryPort,
       foodCatalogQueryPort,
     ),
+    updateDraftLineQuantityCommand:
+      buildUpdateDraftLineQuantityCommand(draftRepositoryPort),
+    removeDraftLineCommand: buildRemoveDraftLineCommand(draftRepositoryPort),
+    moveDraftLineCommand: buildMoveDraftLineCommand(draftRepositoryPort),
   }
 }
 

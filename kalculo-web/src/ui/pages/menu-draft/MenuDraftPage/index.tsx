@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ChildProfile } from '../../../../modules/child-profile'
 import type { DailyMenuDraft, FoodItem } from '../../../../modules/menu-draft'
 import {
+  DraftLineNotFoundError,
   FoodItemNotFoundError,
   IncoherentFoodNutritionDataError,
   IncompleteFoodNutritionDataError,
@@ -22,6 +23,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
 
   const [foods, setFoods] = useState<FoodItem[]>([])
   const [draft, setDraft] = useState<DailyMenuDraft | null>(null)
+  const [lineQuantities, setLineQuantities] = useState<Record<string, string>>({})
   const [selectedFoodId, setSelectedFoodId] = useState('')
   const [quantityGrams, setQuantityGrams] = useState('100')
   const [isLoading, setIsLoading] = useState(true)
@@ -57,6 +59,22 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
     loadData()
   }, [childProfile.id, currentDay, parentId, useCases])
 
+  useEffect(() => {
+    if (!draft) {
+      return
+    }
+
+    setLineQuantities((previous) => {
+      const nextLineQuantities: Record<string, string> = {}
+
+      draft.lines.forEach((line) => {
+        nextLineQuantities[line.id] = previous[line.id] ?? String(line.quantityGrams)
+      })
+
+      return nextLineQuantities
+    })
+  }, [draft])
+
   const handleAddFood = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
@@ -79,8 +97,89 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
         caught instanceof FoodItemNotFoundError ||
         caught instanceof InvalidQuantityError ||
         caught instanceof IncompleteFoodNutritionDataError ||
-        caught instanceof IncoherentFoodNutritionDataError
+        caught instanceof IncoherentFoodNutritionDataError ||
+        caught instanceof DraftLineNotFoundError
       ) {
+        setError(caught.message)
+      } else {
+        setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleUpdateLineQuantity = async (lineId: string) => {
+    setError(null)
+
+    try {
+      setIsSubmitting(true)
+
+      const updatedDraft = await useCases.menuDraft.updateDraftLineQuantityCommand({
+        parentId,
+        childId: childProfile.id,
+        day: currentDay,
+        lineId,
+        quantityGrams: Number(lineQuantities[lineId]),
+      })
+
+      setDraft(updatedDraft)
+    } catch (caught) {
+      if (
+        caught instanceof InvalidQuantityError ||
+        caught instanceof DraftLineNotFoundError
+      ) {
+        setError(caught.message)
+      } else {
+        setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleRemoveLine = async (lineId: string) => {
+    setError(null)
+
+    try {
+      setIsSubmitting(true)
+
+      const updatedDraft = await useCases.menuDraft.removeDraftLineCommand({
+        parentId,
+        childId: childProfile.id,
+        day: currentDay,
+        lineId,
+      })
+
+      setDraft(updatedDraft)
+    } catch (caught) {
+      if (caught instanceof DraftLineNotFoundError) {
+        setError(caught.message)
+      } else {
+        setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleMoveLine = async (lineId: string, direction: 'up' | 'down') => {
+    setError(null)
+
+    try {
+      setIsSubmitting(true)
+
+      const updatedDraft = await useCases.menuDraft.moveDraftLineCommand({
+        parentId,
+        childId: childProfile.id,
+        day: currentDay,
+        lineId,
+        direction,
+      })
+
+      setDraft(updatedDraft)
+    } catch (caught) {
+      if (caught instanceof DraftLineNotFoundError) {
         setError(caught.message)
       } else {
         setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
@@ -163,6 +262,60 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                 <p className="menu-draft-page__line-title">
                   {line.foodName} - {line.quantityGrams}g
                 </p>
+                <div className="menu-draft-page__line-actions">
+                  <Input
+                    label="Quantite (g)"
+                    type="number"
+                    min={1}
+                    step="1"
+                    value={lineQuantities[line.id] ?? String(line.quantityGrams)}
+                    onChange={(event) =>
+                      setLineQuantities((previous) => ({
+                        ...previous,
+                        [line.id]: event.target.value,
+                      }))
+                    }
+                    disabled={isSubmitting}
+                  />
+                  <div className="menu-draft-page__line-buttons">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={isSubmitting}
+                      onClick={() => handleMoveLine(line.id, 'up')}
+                    >
+                      Monter
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={isSubmitting}
+                      onClick={() => handleMoveLine(line.id, 'down')}
+                    >
+                      Descendre
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={isSubmitting}
+                      onClick={() => handleUpdateLineQuantity(line.id)}
+                    >
+                      Mettre a jour
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      disabled={isSubmitting}
+                      onClick={() => handleRemoveLine(line.id)}
+                    >
+                      Supprimer
+                    </Button>
+                  </div>
+                </div>
                 <p className="menu-draft-page__line-macros">
                   Totaux: {line.nutritionTotals.caloriesKcal} kcal, P {line.nutritionTotals.proteinGrams}g,
                   C {line.nutritionTotals.carbsGrams}g, L {line.nutritionTotals.fatsGrams}g

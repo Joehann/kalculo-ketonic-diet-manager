@@ -1,5 +1,5 @@
 import type { FoodItem, FoodNutritionPer100g } from './FoodItem'
-import { InvalidQuantityError } from './errors/MenuDraftError'
+import { DraftLineNotFoundError, InvalidQuantityError } from './errors/MenuDraftError'
 
 export type MenuDraftLineNutritionTotals = {
   caloriesKcal: number
@@ -84,4 +84,99 @@ export const appendLineToDraft = (
   updatedAt: new Date(),
 })
 
+export const updateDraftLineQuantity = (
+  draft: DailyMenuDraft,
+  lineId: string,
+  quantityGrams: number,
+): DailyMenuDraft => {
+  if (!Number.isFinite(quantityGrams) || quantityGrams <= 0) {
+    throw new InvalidQuantityError('La quantite doit etre un nombre strictement positif')
+  }
+
+  let hasUpdated = false
+
+  const updatedLines = draft.lines.map((line) => {
+    if (line.id !== lineId) {
+      return line
+    }
+
+    hasUpdated = true
+
+    return {
+      ...line,
+      quantityGrams,
+      nutritionTotals: computeNutritionTotals(line.nutritionPer100gSnapshot, quantityGrams),
+    }
+  })
+
+  if (!hasUpdated) {
+    throw new DraftLineNotFoundError('Ligne introuvable dans le menu brouillon')
+  }
+
+  return {
+    ...draft,
+    lines: updatedLines,
+    updatedAt: new Date(),
+  }
+}
+
+export const removeDraftLine = (
+  draft: DailyMenuDraft,
+  lineId: string,
+): DailyMenuDraft => {
+  const nextLines = draft.lines.filter((line) => line.id !== lineId)
+
+  if (nextLines.length === draft.lines.length) {
+    throw new DraftLineNotFoundError('Ligne introuvable dans le menu brouillon')
+  }
+
+  return {
+    ...draft,
+    lines: nextLines,
+    updatedAt: new Date(),
+  }
+}
+
+export const moveDraftLine = (
+  draft: DailyMenuDraft,
+  lineId: string,
+  direction: 'up' | 'down',
+): DailyMenuDraft => {
+  const currentIndex = draft.lines.findIndex((line) => line.id === lineId)
+
+  if (currentIndex === -1) {
+    throw new DraftLineNotFoundError('Ligne introuvable dans le menu brouillon')
+  }
+
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+
+  if (targetIndex < 0 || targetIndex >= draft.lines.length) {
+    return draft
+  }
+
+  const nextLines = [...draft.lines]
+  const [movedLine] = nextLines.splice(currentIndex, 1)
+  nextLines.splice(targetIndex, 0, movedLine)
+
+  return {
+    ...draft,
+    lines: nextLines,
+    updatedAt: new Date(),
+  }
+}
+
 const round2 = (value: number): number => Math.round(value * 100) / 100
+
+const computeNutritionTotals = (
+  nutritionPer100g: FoodNutritionPer100g,
+  quantityGrams: number,
+): MenuDraftLineNutritionTotals => {
+  const ratio = quantityGrams / 100
+
+  return {
+    caloriesKcal: round2(nutritionPer100g.caloriesKcal * ratio),
+    proteinGrams: round2(nutritionPer100g.proteinGrams * ratio),
+    carbsGrams: round2(nutritionPer100g.carbsGrams * ratio),
+    fatsGrams: round2(nutritionPer100g.fatsGrams * ratio),
+  }
+}

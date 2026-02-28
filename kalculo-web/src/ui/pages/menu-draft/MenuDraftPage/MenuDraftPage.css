@@ -82,6 +82,17 @@
   font-size: 0.875rem;
 }
 
+.menu-draft-page__line-actions {
+  margin-top: 0.5rem;
+}
+
+.menu-draft-page__line-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 8px;
+}
+
 .menu-draft-page__line-macros {
   margin-top: 0.25rem;
 }

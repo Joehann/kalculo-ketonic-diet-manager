@@ -53,7 +53,7 @@ development_status:
   epic-2: backlog
   2-1-ajouter-et-selectionner-des-aliments-pour-un-menu: review
   2-2-valider-la-coherence-nutritionnelle-des-donnees-aliments: review
-  2-3-creer-et-modifier-un-menu-quotidien-en-mode-brouillon: backlog
+  2-3-creer-et-modifier-un-menu-quotidien-en-mode-brouillon: review
   2-4-calculer-les-totaux-macros-et-afficher-la-conformite: backlog
   2-5-bloquer-le-partage-des-menus-non-conformes: backlog
   epic-2-retrospective: optional
