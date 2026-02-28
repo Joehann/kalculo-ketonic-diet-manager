@@ -29,6 +29,11 @@ export {
   type MoveDraftLineCommandInput,
 } from './application/commands/moveDraftLineCommand'
 export {
+  buildLockDraftMenuCommand,
+  type LockDraftMenuCommand,
+  type LockDraftMenuCommandInput,
+} from './application/commands/lockDraftMenuCommand'
+export {
   buildGetDailyDraftMenuQuery,
   type GetDailyDraftMenuQuery,
 } from './application/queries/getDailyDraftMenuQuery'
@@ -56,6 +61,7 @@ import { buildAddFoodToDraftMenuCommand } from './application/commands/addFoodTo
 import { buildMoveDraftLineCommand } from './application/commands/moveDraftLineCommand'
 import { buildRemoveDraftLineCommand } from './application/commands/removeDraftLineCommand'
 import { buildUpdateDraftLineQuantityCommand } from './application/commands/updateDraftLineQuantityCommand'
+import { buildLockDraftMenuCommand } from './application/commands/lockDraftMenuCommand'
 import { buildCalculateDraftComplianceQuery } from './application/queries/calculateDraftComplianceQuery'
 import { buildAuthorizeDraftShareQuery } from './application/queries/authorizeDraftShareQuery'
 import { buildGetDailyDraftMenuQuery } from './application/queries/getDailyDraftMenuQuery'
@@ -103,6 +109,10 @@ export const buildMenuDraftUseCases = (
       buildUpdateDraftLineQuantityCommand(draftRepositoryPort),
     removeDraftLineCommand: buildRemoveDraftLineCommand(draftRepositoryPort),
     moveDraftLineCommand: buildMoveDraftLineCommand(draftRepositoryPort),
+    lockDraftMenuCommand: buildLockDraftMenuCommand(
+      draftRepositoryPort,
+      calculateDraftComplianceQuery,
+    ),
   }
 }
 

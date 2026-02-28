@@ -137,4 +137,18 @@
 
 .menu-draft-page__share-action {
   margin-top: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.menu-draft-page__lock-status {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.menu-draft-page__lock-status--locked {
+  color: #b91c1c;
 }

@@ -11,3 +11,5 @@ export class IncompleteFoodNutritionDataError extends MenuDraftError {}
 export class IncoherentFoodNutritionDataError extends MenuDraftError {}
 export class DraftLineNotFoundError extends MenuDraftError {}
 export class MenuNotCompliantForSharingError extends MenuDraftError {}
+export class DraftLockedError extends MenuDraftError {}
+export class MenuNotCompliantForLockError extends MenuDraftError {}

@@ -7,6 +7,8 @@ const sampleDraft: DailyMenuDraft = {
   parentId: 'parent-1',
   childId: 'child-1',
   day: '2026-02-28',
+  status: 'draft',
+  lockedAt: null,
   updatedAt: new Date(),
   lines: [
     {

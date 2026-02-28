@@ -59,7 +59,7 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: backlog
-  3-1-verrouiller-un-menu-conforme: backlog
+  3-1-verrouiller-un-menu-conforme: review
   3-2-enforcer-l-immutabilite-pour-les-acteurs-non-parent: backlog
   3-3-conserver-et-consulter-l-historique-des-menus-verrouilles: backlog
   epic-3-retrospective: optional

@@ -7,10 +7,12 @@ import type {
 } from '../../../../modules/menu-draft'
 import {
   DraftLineNotFoundError,
+  DraftLockedError,
   FoodItemNotFoundError,
   IncoherentFoodNutritionDataError,
   IncompleteFoodNutritionDataError,
   InvalidQuantityError,
+  MenuNotCompliantForLockError,
   MenuNotCompliantForSharingError,
 } from '../../../../modules/menu-draft'
 import { useUseCases } from '../../../../app/providers/useUseCases'
@@ -36,6 +38,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   const [error, setError] = useState<string | null>(null)
   const [complianceResult, setComplianceResult] = useState<DraftComplianceResult | null>(null)
   const [shareMessage, setShareMessage] = useState<string | null>(null)
+  const [lockMessage, setLockMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -82,10 +85,15 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
     })
   }, [draft])
 
-  const handleAddFood = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const resetMessages = () => {
     setError(null)
     setShareMessage(null)
+    setLockMessage(null)
+  }
+
+  const handleAddFood = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    resetMessages()
 
     try {
       setIsSubmitting(true)
@@ -107,7 +115,8 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
         caught instanceof InvalidQuantityError ||
         caught instanceof IncompleteFoodNutritionDataError ||
         caught instanceof IncoherentFoodNutritionDataError ||
-        caught instanceof DraftLineNotFoundError
+        caught instanceof DraftLineNotFoundError ||
+        caught instanceof DraftLockedError
       ) {
         setError(caught.message)
       } else {
@@ -119,8 +128,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   }
 
   const handleUpdateLineQuantity = async (lineId: string) => {
-    setError(null)
-    setShareMessage(null)
+    resetMessages()
 
     try {
       setIsSubmitting(true)
@@ -138,7 +146,8 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
     } catch (caught) {
       if (
         caught instanceof InvalidQuantityError ||
-        caught instanceof DraftLineNotFoundError
+        caught instanceof DraftLineNotFoundError ||
+        caught instanceof DraftLockedError
       ) {
         setError(caught.message)
       } else {
@@ -150,8 +159,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   }
 
   const handleRemoveLine = async (lineId: string) => {
-    setError(null)
-    setShareMessage(null)
+    resetMessages()
 
     try {
       setIsSubmitting(true)
@@ -166,7 +174,10 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       setDraft(updatedDraft)
       setComplianceResult(null)
     } catch (caught) {
-      if (caught instanceof DraftLineNotFoundError) {
+      if (
+        caught instanceof DraftLineNotFoundError ||
+        caught instanceof DraftLockedError
+      ) {
         setError(caught.message)
       } else {
         setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
@@ -177,8 +188,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   }
 
   const handleMoveLine = async (lineId: string, direction: 'up' | 'down') => {
-    setError(null)
-    setShareMessage(null)
+    resetMessages()
 
     try {
       setIsSubmitting(true)
@@ -194,7 +204,10 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
       setDraft(updatedDraft)
       setComplianceResult(null)
     } catch (caught) {
-      if (caught instanceof DraftLineNotFoundError) {
+      if (
+        caught instanceof DraftLineNotFoundError ||
+        caught instanceof DraftLockedError
+      ) {
         setError(caught.message)
       } else {
         setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
@@ -205,8 +218,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
   }
 
   const handleCalculateCompliance = async () => {
-    setError(null)
-    setShareMessage(null)
+    resetMessages()
 
     try {
       setIsSubmitting(true)
@@ -225,9 +237,36 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
     }
   }
 
+  const handleLockMenu = async () => {
+    resetMessages()
+
+    try {
+      setIsSubmitting(true)
+
+      const lockedDraft = await useCases.menuDraft.lockDraftMenuCommand({
+        parentId,
+        childId: childProfile.id,
+        day: currentDay,
+      })
+
+      setDraft(lockedDraft)
+      setLockMessage('Menu verrouille: contenu fige, edition desactivee.')
+    } catch (caught) {
+      if (
+        caught instanceof MenuNotCompliantForLockError ||
+        caught instanceof DraftLockedError
+      ) {
+        setError(caught.message)
+      } else {
+        setError(caught instanceof Error ? caught.message : 'Erreur inconnue')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const handleOpenShareFlow = async () => {
-    setError(null)
-    setShareMessage(null)
+    resetMessages()
 
     try {
       setIsSubmitting(true)
@@ -265,6 +304,8 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
     )
   }
 
+  const isLocked = draft.status === 'locked'
+
   return (
     <div className="menu-draft-page">
       <Card>
@@ -273,11 +314,21 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
           <p className="menu-draft-page__subtitle">
             {childProfile.firstName} - {currentDay}
           </p>
+          <p
+            className={
+              isLocked
+                ? 'menu-draft-page__lock-status menu-draft-page__lock-status--locked'
+                : 'menu-draft-page__lock-status'
+            }
+          >
+            Etat: {isLocked ? 'Verrouille' : 'Brouillon'}
+          </p>
         </CardHeader>
 
         <CardBody>
           {error && <Alert type="error">{error}</Alert>}
           {shareMessage && <Alert type="success">{shareMessage}</Alert>}
+          {lockMessage && <Alert type="success">{lockMessage}</Alert>}
 
           <form className="menu-draft-page__form" onSubmit={handleAddFood}>
             <div className="menu-draft-page__field">
@@ -289,7 +340,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                 className="menu-draft-page__select"
                 value={selectedFoodId}
                 onChange={(event) => setSelectedFoodId(event.target.value)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isLocked}
               >
                 {foods.map((food) => (
                   <option key={food.id} value={food.id}>
@@ -306,11 +357,11 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
               step="1"
               value={quantityGrams}
               onChange={(event) => setQuantityGrams(event.target.value)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLocked}
               required
             />
 
-            <Button type="submit" isLoading={isSubmitting}>
+            <Button type="submit" isLoading={isSubmitting} disabled={isLocked}>
               Ajouter au menu
             </Button>
           </form>
@@ -340,14 +391,14 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                         [line.id]: event.target.value,
                       }))
                     }
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isLocked}
                   />
                   <div className="menu-draft-page__line-buttons">
                     <Button
                       type="button"
                       variant="secondary"
                       size="sm"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isLocked}
                       onClick={() => handleMoveLine(line.id, 'up')}
                     >
                       Monter
@@ -356,7 +407,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                       type="button"
                       variant="secondary"
                       size="sm"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isLocked}
                       onClick={() => handleMoveLine(line.id, 'down')}
                     >
                       Descendre
@@ -365,7 +416,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                       type="button"
                       variant="secondary"
                       size="sm"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isLocked}
                       onClick={() => handleUpdateLineQuantity(line.id)}
                     >
                       Mettre a jour
@@ -374,7 +425,7 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
                       type="button"
                       variant="danger"
                       size="sm"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isLocked}
                       onClick={() => handleRemoveLine(line.id)}
                     >
                       Supprimer
@@ -437,6 +488,15 @@ export const MenuDraftPage = ({ parentId, childProfile }: MenuDraftPageProps) =>
             )}
 
             <div className="menu-draft-page__share-action">
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                disabled={isSubmitting || isLocked}
+                onClick={handleLockMenu}
+              >
+                Verrouiller menu
+              </Button>
               <Button
                 type="button"
                 variant="primary"

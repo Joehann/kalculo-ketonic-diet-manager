@@ -1,5 +1,9 @@
 import type { FoodItem, FoodNutritionPer100g } from './FoodItem'
-import { DraftLineNotFoundError, InvalidQuantityError } from './errors/MenuDraftError'
+import {
+  DraftLineNotFoundError,
+  DraftLockedError,
+  InvalidQuantityError,
+} from './errors/MenuDraftError'
 
 export type MenuDraftLineNutritionTotals = {
   caloriesKcal: number
@@ -23,6 +27,8 @@ export type DailyMenuDraft = {
   parentId: string
   childId: string
   day: string
+  status: 'draft' | 'locked'
+  lockedAt: Date | null
   lines: MenuDraftLine[]
   updatedAt: Date
 }
@@ -42,6 +48,8 @@ export const createDraftIfMissing = (
     parentId,
     childId,
     day,
+    status: 'draft',
+    lockedAt: null,
     lines: [],
     updatedAt: new Date(),
   }
@@ -79,16 +87,31 @@ export const appendLineToDraft = (
   draft: DailyMenuDraft,
   line: MenuDraftLine,
 ): DailyMenuDraft => ({
-  ...draft,
+  ...assertDraftEditable(draft),
   lines: [...draft.lines, line],
   updatedAt: new Date(),
 })
+
+export const lockDraftMenu = (draft: DailyMenuDraft): DailyMenuDraft => {
+  if (draft.status === 'locked') {
+    return draft
+  }
+
+  return {
+    ...draft,
+    status: 'locked',
+    lockedAt: new Date(),
+    updatedAt: new Date(),
+  }
+}
 
 export const updateDraftLineQuantity = (
   draft: DailyMenuDraft,
   lineId: string,
   quantityGrams: number,
 ): DailyMenuDraft => {
+  assertDraftEditable(draft)
+
   if (!Number.isFinite(quantityGrams) || quantityGrams <= 0) {
     throw new InvalidQuantityError('La quantite doit etre un nombre strictement positif')
   }
@@ -124,6 +147,8 @@ export const removeDraftLine = (
   draft: DailyMenuDraft,
   lineId: string,
 ): DailyMenuDraft => {
+  assertDraftEditable(draft)
+
   const nextLines = draft.lines.filter((line) => line.id !== lineId)
 
   if (nextLines.length === draft.lines.length) {
@@ -142,6 +167,8 @@ export const moveDraftLine = (
   lineId: string,
   direction: 'up' | 'down',
 ): DailyMenuDraft => {
+  assertDraftEditable(draft)
+
   const currentIndex = draft.lines.findIndex((line) => line.id === lineId)
 
   if (currentIndex === -1) {
@@ -166,6 +193,16 @@ export const moveDraftLine = (
 }
 
 const round2 = (value: number): number => Math.round(value * 100) / 100
+
+const assertDraftEditable = (draft: DailyMenuDraft): DailyMenuDraft => {
+  if (draft.status === 'locked') {
+    throw new DraftLockedError(
+      'Menu verrouille: edition impossible. Dupliquez le menu pour le modifier.',
+    )
+  }
+
+  return draft
+}
 
 const computeNutritionTotals = (
   nutritionPer100g: FoodNutritionPer100g,
