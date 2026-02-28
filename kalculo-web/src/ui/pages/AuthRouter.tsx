@@ -25,6 +25,7 @@ export const AuthRouter = ({ onAuthenticationSuccess }: AuthRouterProps) => {
       {currentView === 'register' && (
         <RegisterPage
           onRegisterSuccess={(_parent: Parent) => {
+            void _parent
             setCurrentView('login')
           }}
           onNavigateToLogin={() => setCurrentView('login')}

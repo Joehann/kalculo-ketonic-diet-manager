@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { DailyNutritionSummary } from '../../../../modules/nutrition/domain/DailyNutritionSummary'
-import {
-  calculateMacroPercentages,
-  NutritionDashboardView,
-} from './index'
+import { NutritionDashboardView } from './NutritionDashboardView'
+import { calculateMacroPercentages } from './calculateMacroPercentages'
 
 const sampleSummary: DailyNutritionSummary = {
   childFirstName: 'Lina',

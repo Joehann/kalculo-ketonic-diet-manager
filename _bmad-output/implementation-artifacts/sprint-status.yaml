@@ -44,7 +44,7 @@ development_status:
   1-1-set-up-initial-project-from-starter-template: review
   1-2-creer-un-compte-parent-avec-authentification-securisee: review
   1-3-accepter-les-termes-et-limites-de-responsabilite: review
-  1-4-gerer-le-profil-enfant-et-le-protocole-dietetique: backlog
+  1-4-gerer-le-profil-enfant-et-le-protocole-dietetique: review
   1-5-configurer-les-cibles-macros-avec-historique-versionne: backlog
   1-6-initialiser-le-backend-axum-en-base-technique-isolee: backlog
   1-7-integrer-les-contrats-frontend-avec-l-api-reelle: backlog

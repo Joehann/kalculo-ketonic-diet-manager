@@ -1,0 +1,61 @@
+.child-profile-page {
+  width: 100%;
+  max-width: 720px;
+}
+
+.child-profile-page__card {
+  width: 100%;
+}
+
+.child-profile-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.child-profile-page__title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.child-profile-page__subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.child-profile-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.child-profile-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.child-profile-page__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.child-profile-page__select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #111827;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+}
+
+.child-profile-page__select:focus {
+  outline: 2px solid #bfdbfe;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}

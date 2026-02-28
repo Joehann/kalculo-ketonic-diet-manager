@@ -11,6 +11,7 @@ import {
   InMemoryTermsAcceptanceRepositoryAdapter,
   InMemoryTermsStorageAdapter,
 } from '../../modules/terms'
+import { buildChildProfileUseCases } from '../../modules/child-profile'
 
 export const buildDiContainer = () => {
   const dataSource = getDataSourceFromEnv()
@@ -35,6 +36,7 @@ export const buildDiContainer = () => {
         sessionStorageAdapter,
       ),
       terms: buildTermsUseCases(termsAcceptanceRepositoryAdapter, termsStorageAdapter),
+      childProfile: buildChildProfileUseCases(dataSource),
     },
   }
 }

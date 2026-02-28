@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { AuthRouter } from './ui/pages'
 import { TermsAcceptancePage } from './ui/pages/terms'
 import { NutritionDashboard } from './ui/pages/nutrition'
+import { ChildProfilePage } from './ui/pages/child-profile'
 import type { SessionToken } from './modules/authentication'
+import { ChildProfileNotFoundError } from './modules/child-profile'
+import { useUseCases } from './app/providers/useUseCases'
 import {
   type AppState,
   transitionAfterAuthentication,
@@ -11,18 +14,40 @@ import {
   transitionAfterTermsStep,
 } from './app/flow/appFlow'
 
-// Import pour le OLD app (nutrition demo) - à décommenter pour tester
-// import { useUseCases } from './app/providers/useUseCases'
-// import type { DailyNutritionSummary } from './modules/nutrition/domain/DailyNutritionSummary'
-
 function App() {
+  const useCases = useUseCases()
   const [appState, setAppState] = useState<AppState>('auth')
   const [session, setSession] = useState<SessionToken | null>(null)
+  const [hasChildProfile, setHasChildProfile] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const loadChildProfileState = async () => {
+      if (appState !== 'authenticated' || !session) {
+        setHasChildProfile(null)
+        return
+      }
+
+      try {
+        await useCases.childProfile.getChildProfileQuery(session.parentId)
+        setHasChildProfile(true)
+      } catch (caught) {
+        if (caught instanceof ChildProfileNotFoundError) {
+          setHasChildProfile(false)
+          return
+        }
+
+        setHasChildProfile(false)
+      }
+    }
+
+    loadChildProfileState()
+  }, [appState, session, useCases])
 
   const handleAuthenticationSuccess = (sessionToken: SessionToken) => {
     const nextFlow = transitionAfterAuthentication(sessionToken)
     setSession(nextFlow.session)
     setAppState(nextFlow.appState)
+    setHasChildProfile(null)
   }
 
   const handleTermsAcceptance = () => {
@@ -42,6 +67,7 @@ function App() {
     const nextFlow = transitionAfterLogout()
     setSession(nextFlow.session)
     setAppState(nextFlow.appState)
+    setHasChildProfile(null)
   }
 
   return (
@@ -66,13 +92,35 @@ function App() {
               <p>Session Token: {session.token.substring(0, 20)}...</p>
               <p>Expire le: {new Date(session.expiresAt).toLocaleString('fr-FR')}</p>
             </div>
-            <button className="logout-btn" onClick={handleLogout}>
-              Déconnexion
-            </button>
+            <div className="header__actions">
+              {hasChildProfile && (
+                <button
+                  className="secondary-btn"
+                  onClick={() => setHasChildProfile(false)}
+                >
+                  Modifier profil enfant
+                </button>
+              )}
+              <button className="logout-btn" onClick={handleLogout}>
+                Déconnexion
+              </button>
+            </div>
           </header>
 
           <section className="main-content">
-            <NutritionDashboard />
+            {hasChildProfile === null && (
+              <p className="main-content__status">Chargement du profil enfant...</p>
+            )}
+
+            {hasChildProfile === false && (
+              <ChildProfilePage
+                parentId={session.parentId}
+                submitLabel="Enregistrer et continuer"
+                onProfileSaved={() => setHasChildProfile(true)}
+              />
+            )}
+
+            {hasChildProfile === true && <NutritionDashboard />}
           </section>
         </div>
       )}
@@ -81,67 +129,3 @@ function App() {
 }
 
 export default App
-
-/**
- * Alternative: Nutrition Demo
- * 
- * Pour tester la démo nutrition (ancienne version), décommenter le code ci-dessous
- * et changer le state initial de appState
- */
-/*
-function NutritionDemo() {
-  const useCases = useUseCases()
-  const [summary, setSummary] = useState<DailyNutritionSummary | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    useCases.nutrition
-      .getDailyNutritionSummaryQuery()
-      .then((data) => setSummary(data))
-      .catch((loadError: Error) => setError(loadError.message))
-  }, [useCases])
-
-  return (
-    <>
-      <header>
-        <p className="badge">Kalculo - Front baseline</p>
-        <h1>Simulation in-memory active</h1>
-      </header>
-
-      {error && <p className="error-text">Error: {error}</p>}
-
-      {!error && !summary && <p>Loading fake data...</p>}
-
-      {summary && (
-        <section className="summary-card">
-          <h2>Daily nutrition preview</h2>
-          <ul>
-            <li>
-              <strong>Child:</strong> {summary.childFirstName}
-            </li>
-            <li>
-              <strong>Protocol:</strong> {summary.protocol}
-            </li>
-            <li>
-              <strong>Calories:</strong> {summary.caloriesKcal} kcal
-            </li>
-            <li>
-              <strong>Protein:</strong> {summary.proteinGrams} g
-            </li>
-            <li>
-              <strong>Carbs:</strong> {summary.carbsGrams} g
-            </li>
-            <li>
-              <strong>Fats:</strong> {summary.fatsGrams} g
-            </li>
-          </ul>
-          <p className="hint-text">
-            The UI consumes use cases from React context. Adapter selection
-            happens in the DI composition root through environment mapping.
-          </p>
-        </section>
-      )}
-    </>
-  )
-}
-*/
