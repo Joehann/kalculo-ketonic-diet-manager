@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react'
 import type { TermsAcceptance } from '../../../../modules/terms'
 import {
   DuplicateAcceptanceError,
-  TermsNotAcceptedError,
 } from '../../../../modules/terms'
 import { useUseCases } from '../../../../app/providers/useUseCases'
-import { Card, CardHeader, CardBody, Button, Alert } from '../../../design-system'
+import { Card, CardHeader, CardBody, Alert } from '../../../design-system'
 import { TermsAcceptanceForm } from '../forms/TermsAcceptanceForm'
 import './TermsAcceptancePage.css'
 

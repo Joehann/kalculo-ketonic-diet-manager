@@ -4,34 +4,44 @@ import { AuthRouter } from './ui/pages'
 import { TermsAcceptancePage } from './ui/pages/terms'
 import { NutritionDashboard } from './ui/pages/nutrition'
 import type { SessionToken } from './modules/authentication'
+import {
+  type AppState,
+  transitionAfterAuthentication,
+  transitionAfterLogout,
+  transitionAfterTermsStep,
+} from './app/flow/appFlow'
 
 // Import pour le OLD app (nutrition demo) - à décommenter pour tester
 // import { useUseCases } from './app/providers/useUseCases'
 // import type { DailyNutritionSummary } from './modules/nutrition/domain/DailyNutritionSummary'
-
-type AppState = 'auth' | 'terms' | 'authenticated' | 'nutrition-demo'
 
 function App() {
   const [appState, setAppState] = useState<AppState>('auth')
   const [session, setSession] = useState<SessionToken | null>(null)
 
   const handleAuthenticationSuccess = (sessionToken: SessionToken) => {
-    setSession(sessionToken)
-    setAppState('terms')
+    const nextFlow = transitionAfterAuthentication(sessionToken)
+    setSession(nextFlow.session)
+    setAppState(nextFlow.appState)
   }
 
   const handleTermsAcceptance = () => {
-    setAppState('authenticated')
+    const nextFlow = transitionAfterTermsStep(session)
+    setSession(nextFlow.session)
+    setAppState(nextFlow.appState)
   }
 
   const handleSkipTerms = () => {
     // Allow skipping for now, but this should require acceptance eventually
-    setAppState('authenticated')
+    const nextFlow = transitionAfterTermsStep(session)
+    setSession(nextFlow.session)
+    setAppState(nextFlow.appState)
   }
 
   const handleLogout = () => {
-    setSession(null)
-    setAppState('auth')
+    const nextFlow = transitionAfterLogout()
+    setSession(nextFlow.session)
+    setAppState(nextFlow.appState)
   }
 
   return (
